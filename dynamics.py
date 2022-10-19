@@ -2,7 +2,12 @@ import numpy as np
 
 from scipy.constants import hbar, k
 
-k_B = k
+
+Parameters = {"energy": 7.24e-21, "distance": 4e-11, "mass": 1.67e-27, "time": 10e-14,}
+
+k_B = k/Parameters["energy"] #1.9e-3
+hbar = hbar/Parameters["energy"]/Parameters["time"] #1.4e-1
+
 P = 3
 
 
