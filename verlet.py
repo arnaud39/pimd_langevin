@@ -1,66 +1,43 @@
-import numpy as np 
+import numpy as np
+import matplotlib.pyplot as plt
 
-
-current_positions = [-2,2] #positions of the particles
-current_forces = [0,0] #starting forces on the particles
-velocities = [0,0]
-forces = [0,0]
-mass = [1,1]
-
-new_positions = [0,0]
-new_forces = [0,0]
 
 save_positions = []
 
 iterations = 1000
 timestep = 0.005
+V_0 = 1.0
+a = 0.04
 
 
-for i in range(iterations):
-
-  #Save the current positions
-  save_positions.append(current_positions.copy())
-
-  #Update the positions
-  for j in range(len(current_positions)):
-    new_positions[j] = current_positions[j] + velocities[j]*timestep + (forces[j]/ (2*mass[j]) )*(timestep**2)
-
-  #Find the total force on each particle
-  for j in range(len(current_positions)):
-    new_forces[j]=0
-    for k in range(len(current_positions)):
-      if j==k:
-        continue
-
-      distance = current_positions[j]-current_positions[k]
-      sign = distance /abs(distance)
-      new_forces[j] = new_forces[j]+10*(abs(distance)-5) * -sign
-
-  #Update velocities
-  for j in range(len(current_positions)):
-    velocities[j] = velocities[j] + timestep*(forces[j] + new_forces[j])/(2*mass[j])
-
-  #Set the force as the new forces
-  for j in range(len(current_positions)):
-    forces[j] = new_forces[j]
-
-  #Set the new positions
-  for j in range(len(current_positions)):
-    current_positions[j]=new_positions[j]
+def potential(x: np.array, V_0: float = 1.0, a: float = 1.0) -> np.array:
+    return V_0 * ((x / a) ** 2 - 1) ** 2
 
 
-from matplotlib import pyplot as plt
-from celluloid import Camera
+def d_potential(x: np.array, V_0: float = 1.0, a: float = 1.0) -> np.array:
+    return 4 * V_0 * x * ((x / a) ** 2 - 1)
 
-fig = plt.figure()
-plt.xlim([-4, 4])
-plt.ylim([-1,1])
-camera = Camera(fig)
-for i in range(len(save_positions)):    
-    plt.scatter(save_positions[i],[0]*len(current_positions), s=120, c=[1]*len(current_positions))
-    text = "T = " + str(round(timestep*i,2))
-    plt.text(1, 0.5, text, ha='left',wrap=False)
-    camera.snap()
 
-animation = camera.animate()
-animation.save('spring_gif.gif', writer = 'pillow', fps=40)
+def verlet(inital_positions, initial_velocities, force, iterations, timestep, mass):
+      
+  positions = [inital_positions]
+  velocities = [initial_velocities]
+  for i in range(iterations):
+        new_position = positions[-1] + velocities[-1]*timestep + (force(positions[-1])/ (2*mass) )*(timestep**2)
+        new_velocity = velocities[-1] + timestep*(force(new_position) + force(positions[-1]))
+
+        positions.append(new_position)
+        velocities.append(new_velocity)
+  return positions, velocities
+
+
+positions, velocities = verlet(
+  inital_positions=a + 0.001, 
+  initial_velocities=0 , 
+  force=d_potential, 
+  iterations=1000, 
+  timestep=timestep, 
+  mass=1.67e-27)
+  
+plt.plot(positions)
+plt.show()
