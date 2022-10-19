@@ -5,10 +5,10 @@ import numpy as np
 
 
 Parameters = {
-    "energy": 7.24e-21,
-    "distance": 4e-1,#Amstrom
-    "mass": 1.67e-27,
-    "time": 10e-14,
+    "energy": 7.24e-21, #V_0
+    "distance": 4e-1, #Amstrom
+    "mass": 1.67e-27, #mass proton
+    "time": 10e-14, #computed to have hbar big enough
 }
 
 k_B = k / Parameters["energy"]  # 1.9e-3
