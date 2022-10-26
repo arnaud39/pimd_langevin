@@ -41,14 +41,17 @@ def K(x, m: float = 1.0, T: float = 1.0) -> float:
 
 def random_force(
     v: np.array,
+    timestep: float,
     m: float = 1.0,
     gamma: float = 1.0,
     k_B: float = 1.0,
     T: float = 1.0,
 ) -> np.array:
     """Generate the Langegin random force."""
-    generated_number = np.random.random(len(v))
-    return np.sqrt(2 * m * gamma * k_B * T) * generated_number - m * gamma * v
+    generated_number = np.random.normal(size=len(v))
+    return (
+        np.sqrt(2 * m * gamma * k_B * T) * generated_number / timestep - m * gamma * v
+    )
 
 
 def force_PI(x: np.array, m: float, T: float) -> np.array:
@@ -59,6 +62,7 @@ def force_PI(x: np.array, m: float, T: float) -> np.array:
 def force(
     x: np.array,
     v: np.array,
+    timestep: float,
     m: float = 1.0,
     gamma: float = 1.0,
     V_0: float = 1,
@@ -66,4 +70,8 @@ def force(
     T: float = T,
     k_B: float = k_B,
 ):
-    return force_potential(x=x, V_0=V_0, a=a)
+    return (
+        random_force(v=v, timestep=timestep, m=m, gamma=gamma, k_B=k_B, T=T)
+        + force_PI(x=x, m=m, T=T)
+        + force_potential(x=x, V_0=V_0, a=a)
+    )
