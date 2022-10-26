@@ -6,7 +6,7 @@ import numpy as np
 
 Parameters = {
     "energy": 7.24e-21,  # V_0
-    "distance": 4e-1,  # Amstrom
+    "distance": 4e-10,  # Amstrom
     "mass": 1.67e-27,  # mass proton
     "time": 10e-14,  # computed to have hbar big enough
 }
@@ -16,7 +16,6 @@ k_B = k / Parameters["energy"]  # 1.9e-3
 hbar = hbar / Parameters["energy"] / Parameters["time"]  # 1.4e-1
 
 
-
 def potential(x: np.array, V_0: float = 1, a: float = 1.0) -> np.array:
     """Given potential for the problem."""
     return V_0 * ((x / a) ** 2 - 1) ** 2
@@ -24,15 +23,16 @@ def potential(x: np.array, V_0: float = 1, a: float = 1.0) -> np.array:
 
 def force_potential(x: np.array, V_0: float = 0.3, a: float = 1.0) -> np.array:
     """Gradient of the given potential."""
-    return - (4 * V_0 * x * ((x / a) ** 2 - 1)) / (len(x) * a**2)
+    return -(4 * V_0 * x * ((x / a) ** 2 - 1)) / (len(x) * a**2)
 
 
 def energy(
     x: np.array, v: np.array, m: float = 1.0, V_0: float = 1.0, a: float = 1.0
 ) -> Tuple[np.array, np.array]:
     """Compute potential and kinestic energy of the system."""
-    kinetic_e = m * (v) ** 2 / 2
-    return potential(x, V_0, a), kinetic_e
+    kinetic_e = map(lambda v: m * (v) ** 2 / 2, v)
+    potential_e = map(lambda x: potential(x, V_0, a), x)
+    return list(potential_e), list(kinetic_e)
 
 
 def K(x, m: float = 1.0, T: float = 1.0) -> float:
@@ -61,11 +61,9 @@ def force(
     v: np.array,
     m: float = 1.0,
     gamma: float = 1.0,
-    V_0: float = 0,
+    V_0: float = 1,
     a: float = 1.0,
     T: float = T,
     k_B: float = k_B,
 ):
-    return (
-        force_potential(x=x, V_0=V_0, a=a)
-    )
+    return force_potential(x=x, V_0=V_0, a=a)
