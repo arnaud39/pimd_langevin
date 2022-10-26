@@ -15,17 +15,16 @@ T = 0.4 * 7.24e-21 / k
 k_B = k / Parameters["energy"]  # 1.9e-3
 hbar = hbar / Parameters["energy"] / Parameters["time"]  # 1.4e-1
 
-P = 3
 
 
-def potential(x: np.array, V_0: float = 1.0, a: float = 1.0) -> np.array:
+def potential(x: np.array, V_0: float = 1, a: float = 1.0) -> np.array:
     """Given potential for the problem."""
     return V_0 * ((x / a) ** 2 - 1) ** 2
 
 
-def d_potential(x: np.array, V_0: float = 1.0, a: float = 1.0) -> np.array:
+def force_potential(x: np.array, V_0: float = 0.3, a: float = 1.0) -> np.array:
     """Gradient of the given potential."""
-    return (4 * V_0 * x * ((x / a) ** 2 - 1)) / (-len(x) * a**2)
+    return - (4 * V_0 * x * ((x / a) ** 2 - 1)) / (len(x) * a**2)
 
 
 def energy(
@@ -62,13 +61,11 @@ def force(
     v: np.array,
     m: float = 1.0,
     gamma: float = 1.0,
-    V_0: float = 1.0,
+    V_0: float = 0,
     a: float = 1.0,
     T: float = T,
     k_B: float = k_B,
 ):
     return (
-        random_force(v=v, m=m, gamma=gamma, k_B=k_B, T=T)
-        + force_PI(x=x, m=m, T=T)
-        + d_potential(x=x, V_0=V_0, a=a)
+        force_potential(x=x, V_0=V_0, a=a)
     )

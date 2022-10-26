@@ -4,7 +4,8 @@ from scipy.constants import hbar, k
 from typing import Tuple
 from dynamics import force, Parameters
 
-mass = Parameters["mass"]
+mass = 1 #Parameters["mass"]
+time = Parameters["time"]
 
 
 def verlet(
@@ -13,7 +14,7 @@ def verlet(
     iterations: int,
     timestep: float,
 ):
-
+    timestep = timestep / time
     positions = [inital_positions]
     velocities = [initial_velocities]
 
@@ -22,6 +23,7 @@ def verlet(
         + timestep * velocities[0]
         + timestep**2 * force(x=positions[0], v=velocities[0]) / (2 * mass)
     )
+    print(force(x=positions[0], v=velocities[0]))
     V_1 = velocities[0] + timestep * force(x=positions[0], v=velocities[0])
     positions.append(X_1)
     velocities.append(V_1)
