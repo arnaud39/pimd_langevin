@@ -69,9 +69,11 @@ def force(
     a: float = 1.0,
     T: float = T,
     k_B: float = k_B,
+    termostat: bool = True,
 ):
-    return (
-        random_force(v=v, timestep=timestep, m=m, gamma=gamma, k_B=k_B, T=T)
-        + force_PI(x=x, m=m, T=T)
-        + force_potential(x=x, V_0=V_0, a=a)
-    )
+    if termostat:
+        force = random_force(v=v, timestep=timestep, m=m, gamma=gamma, k_B=k_B, T=T) + force_PI(x=x, m=m, T=T) + force_potential(x=x, V_0=V_0, a=a)
+    else:
+        force = force_PI(x=x, m=m, T=T) + force_potential(x=x, V_0=V_0, a=a)
+    return force
+

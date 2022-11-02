@@ -14,6 +14,7 @@ def verlet(
     iterations: int,
     timestep: float,
     gamma: float,
+    termostat: bool,
 ):
     timestep = timestep / time
     positions = [inital_positions]
@@ -23,11 +24,11 @@ def verlet(
         positions[0]
         + timestep * velocities[0]
         + timestep**2
-        * force(x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma)
+        * force(x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, termostat=termostat)
         / (2 * mass)
     )
     V_1 = velocities[0] + timestep * force(
-        x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma
+        x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, termostat=termostat
     )
     positions.append(X_1)
     velocities.append(V_1)
@@ -36,18 +37,18 @@ def verlet(
         positions[1]
         + timestep * velocities[1]
         + timestep**2
-        * force(x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma)
+        * force(x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, termostat=termostat)
         / (2 * mass)
     )
     V_2 = velocities[1] + timestep * force(
-        x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma
+        x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, termostat=termostat
     )
     positions.append(X_2)
     velocities.append(V_2)
 
     for k in range(iterations - 3):
         new_position, new_velocity = _verlet_step(
-            positions, velocities, timestep=timestep, gamma=gamma
+            positions, velocities, timestep=timestep, gamma=gamma, termostat=termostat
         )
         positions.append(new_position)
         velocities.append(new_velocity)
@@ -60,12 +61,13 @@ def _verlet_step(
     velocities: np.array,
     timestep: float,
     gamma: float,
+    termostat: bool,
 ):
     new_position = (
         2 * positions[-1]
         - positions[-2]
         + timestep**2
-        * force(x=positions[-1], v=velocities[-1], gamma=gamma, timestep=timestep)
+        * force(x=positions[-1], v=velocities[-1], gamma=gamma, timestep=timestep, termostat=termostat)
         / (2 * mass)
     )
     new_velocity = (3 * positions[-1] - 4 * positions[-2] + positions[-3]) / (
