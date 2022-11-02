@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
+from tqdm import tqdm
 from scipy.constants import hbar, k
 from typing import Tuple
-from dynamics import force, Parameters
+from dynamics import force, Parameters, T_0
 
 mass = 1  # Parameters["mass"]
 time = Parameters["time"]
@@ -14,7 +16,8 @@ def verlet(
     iterations: int,
     timestep: float,
     gamma: float,
-    termostat: bool,
+    T: float = T_0,
+    termostat: bool = True,
 ):
     timestep = timestep / time
     positions = [inital_positions]
@@ -24,11 +27,11 @@ def verlet(
         positions[0]
         + timestep * velocities[0]
         + timestep**2
-        * force(x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, termostat=termostat)
-        / (2 * mass)
+        * force(x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, T=T, termostat=termostat)
+        / mass
     )
     V_1 = velocities[0] + timestep * force(
-        x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, termostat=termostat
+        x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, T=T, termostat=termostat
     )
     positions.append(X_1)
     velocities.append(V_1)
@@ -37,18 +40,18 @@ def verlet(
         positions[1]
         + timestep * velocities[1]
         + timestep**2
-        * force(x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, termostat=termostat)
-        / (2 * mass)
+        * force(x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, T=T, termostat=termostat)
+        / mass
     )
     V_2 = velocities[1] + timestep * force(
-        x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, termostat=termostat
+        x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, T=T, termostat=termostat
     )
     positions.append(X_2)
     velocities.append(V_2)
 
-    for k in range(iterations - 3):
+    for k in tqdm(range(iterations - 3)):
         new_position, new_velocity = _verlet_step(
-            positions, velocities, timestep=timestep, gamma=gamma, termostat=termostat
+            positions, velocities, timestep=timestep, gamma=gamma, T=T, termostat=termostat
         )
         positions.append(new_position)
         velocities.append(new_velocity)
@@ -61,14 +64,15 @@ def _verlet_step(
     velocities: np.array,
     timestep: float,
     gamma: float,
+    T: float,
     termostat: bool,
 ):
     new_position = (
         2 * positions[-1]
         - positions[-2]
         + timestep**2
-        * force(x=positions[-1], v=velocities[-1], gamma=gamma, timestep=timestep, termostat=termostat)
-        / (2 * mass)
+        * force(x=positions[-1], v=velocities[-1], gamma=gamma, T=T, timestep=timestep, termostat=termostat)
+        / mass
     )
     new_velocity = (3 * positions[-1] - 4 * positions[-2] + positions[-3]) / (
         2 * timestep
