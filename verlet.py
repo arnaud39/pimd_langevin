@@ -28,11 +28,11 @@ def verlet(
         + timestep * velocities[0]
         + timestep**2
         * force(x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, T=T, termostat=termostat)
-        / mass
+        / mass / 2
     )
     V_1 = velocities[0] + timestep * force(
         x=positions[0], v=velocities[0], timestep=timestep, gamma=gamma, T=T, termostat=termostat
-    )
+    ) / mass
     positions.append(X_1)
     velocities.append(V_1)
 
@@ -41,11 +41,11 @@ def verlet(
         + timestep * velocities[1]
         + timestep**2
         * force(x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, T=T, termostat=termostat)
-        / mass
+        / mass / 2
     )
     V_2 = velocities[1] + timestep * force(
         x=positions[1], v=velocities[1], timestep=timestep, gamma=gamma, T=T, termostat=termostat
-    )
+    ) / mass
     positions.append(X_2)
     velocities.append(V_2)
 

@@ -30,7 +30,7 @@ def energy(
     x: np.array, v: np.array, m: float = 1.0, V_0: float = 1.0, a: float = 1.0
 ) -> Tuple[np.array, np.array]:
     """Compute potential and kinestic energy of the system."""
-    kinetic_e = m * v ** 2 / 2
+    kinetic_e = m * v**2 / 2
     potential_e = potential(x, V_0, a)
     return potential_e, kinetic_e
 
@@ -50,7 +50,7 @@ def random_force(
     """Generate the Langegin random force."""
     generated_number = np.random.normal(size=len(v))
     return (
-        np.sqrt(2 * m * gamma * k_B * T /  timestep) * generated_number - m * gamma * v
+        np.sqrt(2 * m * gamma * k_B * T / timestep) * generated_number - m * gamma * v
     )
 
 
@@ -73,8 +73,11 @@ def force(
 ):
     gamma = gamma * Parameters["time"]
     if termostat:
-        force = random_force(v=v, timestep=timestep, m=m, gamma=gamma, k_B=k_B, T=T) + force_PI(x=x, m=m, T=T) + force_potential(x=x, V_0=V_0, a=a)
+        force = (
+            random_force(v=v, timestep=timestep, m=m, gamma=gamma, k_B=k_B, T=T)
+            + force_PI(x=x, m=m, T=T)
+            + force_potential(x=x, V_0=V_0, a=a)
+        )
     else:
         force = force_PI(x=x, m=m, T=T) + force_potential(x=x, V_0=V_0, a=a)
     return force
-
