@@ -5,13 +5,13 @@ import numpy as np
 
 
 Parameters = {
-    "energy": 7.24e-21,  # V_0
-    "distance": 4e-10,  # Amstrom
+    "energy": 6.94e-21, #7.24e-21,  # V_0
+    "distance": 4e-11,  # Amstrom
     "mass": 1.67e-27,  # mass proton
-    "time": 10e-14,  # computed to have hbar big enough
+    "time": 1e-13,  # computed to have hbar big enough
 }
 
-T_0 = 0.4 * 7.24e-21 / k
+T_0 = 0.4 * Parameters["energy"] / k
 k_B = k / Parameters["energy"]  # 1.9e-3
 hbar = hbar / Parameters["energy"] / Parameters["time"]  # 1.4e-1
 
